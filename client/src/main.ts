@@ -52,13 +52,21 @@ const fetchWeather = async (cityName: string) => {
 };
 
 const fetchSearchHistory = async () => {
-  const history = await fetch('/api/weather/history', {
+  const response = await fetch('/api/weather/history', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
   });
-  return history;
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch search history');
+  }
+  
+  return response.json();
+}catch (error) {
+  console.error('Failed to fetch search history', error);
+  return [];
 };
 
 const deleteCityFromHistory = async (id: string) => {
@@ -140,7 +148,7 @@ const renderForecastCard = (forecast: any) => {
 };
 
 const renderSearchHistory = async (searchHistory: any) => {
-  const historyList = await searchHistory.json();
+  const historyList = await searchHistory;
 
   if (searchHistoryContainer) {
     searchHistoryContainer.innerHTML = '';
