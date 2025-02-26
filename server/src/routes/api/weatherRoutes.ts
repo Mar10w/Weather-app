@@ -9,8 +9,8 @@ const router = Router();
 
 router.post('/', async (req: Request, res: Response) => {
   // TODO: GET weather data from city name
-const { cityName } =req.body;
-const weatherData = await weatherService.getWeatherForCity(cityName);
+  const { cityName } = req.body;
+  const weatherData = await weatherService.getWeatherForCity(cityName);
   // TODO: save city to search history
   await historyService.addCity(cityName);
   res.json(weatherData);
@@ -18,15 +18,14 @@ const weatherData = await weatherService.getWeatherForCity(cityName);
 
 // TODO: GET search history
 router.get('/history', async (req: Request, res: Response) => {
-  const cities = await HistoryService.getCities();
+  const cities = await historyService.getCities();
   res.json(cities);
-
 });
 
 // * BONUS TODO: DELETE city from search history
 router.delete('/history/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
-  await HistoryService.removeCity(id);
+  await historyService.removeCity(id);
   res.sendStatus(204);
 });
 
