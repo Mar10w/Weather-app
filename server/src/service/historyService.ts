@@ -1,4 +1,4 @@
-import fs from 'fs/Promises';
+import fs from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
 
 // TODO: Define a City class with name and id properties
@@ -10,15 +10,15 @@ interface City {
 // TODO: Complete the HistoryService class
 class HistoryService {
   private filePath = 'server/db/searchHistory.json';
-}
 
 // TODO: Define a read method that reads from the searchHistory.json file
-  private async read(): Promise<City[]> {
-    try {
-      const data = await fs.readFile(this.filePath, 'utf-8');
-      return JSON.parse(data);
-    } catch (error) {
-      return [];
+
+private async read(): Promise<City[]> {
+  try {
+    const data = await fs.readFile(this.filePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    return [];
   }
 }
 
@@ -46,6 +46,7 @@ async removeCity(id: string): Promise<void> {
   let cities = await this.read();
   cities = cities.filter(city => city.id !== id);
   await this.write(cities);
+  }
 }
 
 export default new HistoryService();

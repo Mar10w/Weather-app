@@ -17,17 +17,20 @@ interface Weather {
   windSpeed: number;
   humidity: number;
 }
+interface LocationData {
+  lat: number;
+  lon: number;
+}
 // TODO: Complete the WeatherService class
 class WeatherService {
-  private baseURL: string = process.env.API.BASE_URL!;
-  private apiKey: string = process.env.API.KEY!;
-  private cityName: string = '';
+  private baseURL: string = process.env.API_BASE_URL!;
+  private apiKey: string = process.env.API_KEY!;
 
   // TODO: Define the baseURL, API key, and city name properties
   // TODO: Create fetchLocationData method
 private async fetchLocationData(query: string): Promise<Coordinates> {
   const response = await fetch(`${this.baseURL}/geo/1.0/direct?q=${query}&limit=1&appid=${this.apiKey}`);
-  const data = await response.json();
+  const data: LocationData[] = await response.json() as LocationData[];
   return { lat: data[0].lat, lon: data[0].lon };
 }
   // TODO: Create destructureLocationData method
@@ -70,12 +73,11 @@ private buildForecastArray(weatherData: any[]): Weather[] {
   }));
 }
   // TODO: Complete getWeatherForCity method
-async getWeatherForCity(city: string): Promise<Weather> {
-  this.cityName = city;
+async getWeatherForCity(city: string): Promise<Weather[]> {
   const coordinates = await this.fetchLocationData(city);
   const weatherData = await this.fetchWeatherData(coordinates);
   const currentWeather = this.parseCurrentWeather(weatherData);
-  const forecast = this.buildForecastArray(weatherData.list);
+  const forecast = this.buildForecastArray(weatherData.list.slice(1, 6));
   return [currentWeather, ...forecast];
   }
 }
