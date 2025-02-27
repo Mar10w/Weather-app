@@ -35,6 +35,7 @@ API Calls
 */
 
 const fetchWeather = async (cityName: string) => {
+  try {
   const response = await fetch('/api/weather/', {
     method: 'POST',
     headers: {
@@ -42,6 +43,10 @@ const fetchWeather = async (cityName: string) => {
     },
     body: JSON.stringify({ cityName }),
   });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch weather data');
+  }
 
   const weatherData = await response.json();
 
@@ -52,10 +57,11 @@ const fetchWeather = async (cityName: string) => {
 };
 
 const fetchSearchHistory = async () => {
-  const response = await fetch('/api/weather/history', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
+  try {
+    const response = await fetch('/api/weather/history', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
     },
   });
 
@@ -65,18 +71,27 @@ const fetchSearchHistory = async () => {
   
   return response.json();
 }catch (error) {
-  console.error('Failed to fetch search history', error);
+  console.error('Error fetching search history', error);
   return [];
+}
 };
 
 const deleteCityFromHistory = async (id: string) => {
-  await fetch(`/api/weather/history/${id}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
+  try {
+    const response = await fetch(`/api/weather/history/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
     },
   });
-};
+
+    if (!response.ok) {
+      throw new Error('Failed to delete city from history');
+  }
+  } catch (error) {
+    console.error('Error deleting city from history', error);
+  }
+};  
 
 /*
 

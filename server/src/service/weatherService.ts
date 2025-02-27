@@ -19,8 +19,8 @@ interface Weather {
 }
 // TODO: Complete the WeatherService class
 class WeatherService {
-  private baseURL: string = Process.env.API.BASE_URL!;
-  private apiKey: string = Process.env.API.KEY!;
+  private baseURL: string = process.env.API.BASE_URL!;
+  private apiKey: string = process.env.API.KEY!;
   private cityName: string = '';
 
   // TODO: Define the baseURL, API key, and city name properties
@@ -59,7 +59,7 @@ private parseCurrentWeather(response: any): Weather {
 }
   // TODO: Complete buildForecastArray method
 private buildForecastArray(weatherData: any[]): Weather[] {
-  return weatherData.map((weather: any) => ({
+  return weatherData.map((data: any) => ({
     city: data.city.name,
     date: data.dt_txt,
     icon: data.weather[0].icon,
