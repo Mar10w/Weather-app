@@ -28,7 +28,7 @@ private async write(cities: City[]): Promise<void> {
 }
 
 // TODO: Define a getCities method that reads the cities from the searchHistory.json file and returns them as an array of City objects
-async getCities(): Promise<City[]> {
+async getSearchHistory(): Promise<City[]> {
   return this.read();
 }
 // TODO Define an addCity method that adds a city to the searchHistory.json file

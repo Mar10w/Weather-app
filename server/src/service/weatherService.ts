@@ -21,6 +21,58 @@ interface LocationData {
   lat: number;
   lon: number;
 }
+
+interface WeatherApiResponse {
+  coord: {
+    lon: number;
+    lat: number;
+  };
+  weather: Array<{
+    id: number;
+    main: string;
+    description: string;
+    icon: string;
+  }>;
+  base: string;
+  main: {
+    temp: number;
+    feels_like: number;
+    temp_min: number;
+    temp_max: number;
+    pressure: number;
+    humidity: number;
+    sea_level?: number;
+    grnd_level?: number;
+  };
+  visibility: number;
+  wind: {
+    speed: number;
+    deg: number;
+    gust?: number;
+  };
+  clouds: {
+    all: number;
+  };
+  rain?: {
+    '1h': number;
+  };
+  snow?: {
+    '1h': number;
+  };
+  dt: number;
+  sys: {
+    type: number;
+    id: number;
+    country: string;
+    sunrise: number;
+    sunset: number;
+  };
+  timezone: number;
+  id: number;
+  name: string;
+  cod: number;
+}
+
 // TODO: Complete the WeatherService class
 class WeatherService {
   private baseURL: string = process.env.API_BASE_URL!;
@@ -31,28 +83,28 @@ class WeatherService {
 private async fetchLocationData(query: string): Promise<Coordinates> {
   const response = await fetch(`${this.baseURL}/geo/1.0/direct?q=${query}&limit=1&appid=${this.apiKey}`);
   const data: LocationData[] = await response.json() as LocationData[];
+  if (data.length === 0) {
+    throw new Error('Location not found');
+  }
   return { lat: data[0].lat, lon: data[0].lon };
 }
-  // TODO: Create destructureLocationData method
-  // private destructureLocationData(locationData: Coordinates): Coordinates {}
-  // TODO: Create buildGeocodeQuery method
-  // private buildGeocodeQuery(): string {}
-  // TODO: Create buildWeatherQuery method
-  // private buildWeatherQuery(coordinates: Coordinates): string {}
-  // TODO: Create fetchAndDestructureLocationData method
-  // private async fetchAndDestructureLocationData() {}
-  // TODO: Create fetchWeatherData method
 
-private async fetchWeatherData(coordinates: Coordinates): Promise<any> {
+
+private async fetchWeatherData(coordinates: Coordinates): Promise<WeatherApiResponse> {
   const response = await fetch(`${this.baseURL}/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}`);
-  return response.json();
+  const data = await response.json() as WeatherApiResponse;
+  if (!data || !data.weather || data.weather.length === 0) {
+    throw new Error('Weather data not found');
+  }
+  console.log('Weather Data:', data);
+  return data;
 }
   // TODO: Build parseCurrentWeather method
-private parseCurrentWeather(response: any): Weather {
-  const currentWeather = response.list[0];
+private parseCurrentWeather(response: WeatherApiResponse): Weather {
+  const currentWeather = response;
   return {
-    city: response.city.name,
-    date: currentWeather.dt_txt,
+    city: response.name,
+    date: new Date(response.dt * 1000).toLocaleDateString(),
     icon: currentWeather.weather[0].icon,
     iconDescription: currentWeather.weather[0].description,
     tempF: currentWeather.main.temp,
@@ -61,9 +113,9 @@ private parseCurrentWeather(response: any): Weather {
   };
 }
   // TODO: Complete buildForecastArray method
-private buildForecastArray(weatherData: any[]): Weather[] {
-  return weatherData.map((data: any) => ({
-    city: data.city.name,
+private buildForecastArray(list: WeatherApiResponse['list'], city: string): Weather[] {
+  return list.map((data) => ({
+    city,
     date: data.dt_txt,
     icon: data.weather[0].icon,
     iconDescription: data.weather[0].description,
@@ -77,8 +129,7 @@ async getWeatherForCity(city: string): Promise<Weather[]> {
   const coordinates = await this.fetchLocationData(city);
   const weatherData = await this.fetchWeatherData(coordinates);
   const currentWeather = this.parseCurrentWeather(weatherData);
-  const forecast = this.buildForecastArray(weatherData.list.slice(1, 6));
-  return [currentWeather, ...forecast];
+  return currentWeather;
   }
 }
 
